@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import "@/mixin/firebase.js";
 export default {
   name: "IndexPage",
   layout: "login",
@@ -77,7 +78,9 @@ export default {
   methods: {
     signGoogle() {},
     EmailLogin() {},
-    EmailJoin() {},
+    EmailJoin() {
+      this.$router.push("/join");
+    },
   },
 };
 </script>

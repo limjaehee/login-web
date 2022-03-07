@@ -1,3 +1,22 @@
 .v-application p {
   margin-bottom: 0;
 }
+
+.v-btn {
+  &.arrow {
+    box-shadow: none;
+
+    &.v-size--default {
+      padding: 0 5px;
+      min-width: auto;
+    }
+
+    &.v-btn--has-bg {
+      background-color: transparent;
+    }
+
+    .v-icon {
+      font-size: 24px;
+    }
+  }
+}
