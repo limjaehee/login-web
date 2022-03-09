@@ -24,18 +24,18 @@
         required
       ></v-text-field>
       <v-text-field
-        v-model="password2"
-        :rules="passwordRule"
-        :append-icon="passwordShow2 ? 'mdi-eye' : 'mdi-eye-off'"
-        :type="passwordShow2 ? 'text' : 'password'"
+        v-model="confirmPassword"
+        :rules="confirmPasswordRule"
+        :append-icon="confirmPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
+        :type="confirmPasswordShow ? 'text' : 'password'"
         label="Password confirm"
-        @click:append="passwordShow2 = !passwordShow2"
+        @click:append="confirmPasswordShow = !confirmPasswordShow"
         required
       ></v-text-field>
       <v-btn
         :disabled="!valid"
         color="success"
-        @click="JoinClear"
+        @click="signUp"
         class="mr-3 mt-4"
         block
       >
@@ -46,7 +46,9 @@
 </template>
 
 <script>
-import "@/mixin/firebase.js";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
+const auth = getAuth();
 export default {
   name: "IndexPage",
   layout: "login",
@@ -54,9 +56,9 @@ export default {
     return {
       email: "",
       password: "",
-      password2: "",
+      confirmPassword: "",
       passwordShow: false,
-      passwordShow2: false,
+      confirmPasswordShow: false,
       valid: false,
       emailRule: [
         (v) => !!v || "이메일을 입력해주세요.",
@@ -74,10 +76,27 @@ export default {
           return replaceV.length >= 8 || "8자리 이상 입력해주세요.";
         },
       ],
+      confirmPasswordRule: [
+        (v) => !!v || "비밀번호를 입력해주세요.",
+        (v) => {
+          return (
+            this.password === this.confirmPassword || "패스워드가 다릅니다."
+          );
+        },
+      ],
     };
   },
   methods: {
-    JoinClear() {},
+    signUp() {
+      createUserWithEmailAndPassword(auth, this.email, this.password)
+        .then((userCredential) => {
+          alert("회원가입 완료!");
+          this.$router.push("/login");
+        })
+        .catch((err) => {
+          alert("에러 : " + err.message);
+        });
+    },
     goLoginPage() {
       this.$router.go(-1);
     },

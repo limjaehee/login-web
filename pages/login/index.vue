@@ -33,12 +33,7 @@
         >
           로그인
         </v-btn>
-        <v-btn
-          :disabled="!valid"
-          color="success"
-          @click="EmailJoin"
-          class="mr-3 mt-4"
-        >
+        <v-btn color="success" @click="EmailJoin" class="mr-3 mt-4">
           회원가입
         </v-btn>
       </v-form>
@@ -47,7 +42,18 @@
 </template>
 
 <script>
-import "@/mixin/firebase.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  onAuthStateChanged,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
+
+import errorCode from "@/constants/errorCode.js";
+const auth = getAuth();
+const provider = new GoogleAuthProvider();
+
 export default {
   name: "IndexPage",
   layout: "login",
@@ -76,8 +82,41 @@ export default {
     };
   },
   methods: {
-    signGoogle() {},
-    EmailLogin() {},
+    signGoogle() {
+      signInWithPopup(auth, provider)
+        .then((result) => {
+          // This gives you a Google Access Token. You can use it to access the Google API.
+          const credential = GoogleAuthProvider.credentialFromResult(result);
+          const token = credential.accessToken;
+          // The signed-in user info.
+          const user = result.user;
+          // ...
+        })
+        .catch((error) => {
+          // Handle Errors here.
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          // The email of the user's account used.
+          const email = error.email;
+          // The AuthCredential type that was used.
+          const credential = GoogleAuthProvider.credentialFromError(error);
+          // ...
+        });
+    },
+    EmailLogin() {
+      signInWithEmailAndPassword(auth, this.email, this.password)
+        .then((userCredential) => {
+          const id = userCredential.user.uid;
+          this.$router.push({
+            path: `login/${id}`,
+            name: "login-id",
+            query: { userId: id },
+          });
+        })
+        .catch((err) => {
+          alert(errorCode.LOGIN_ERROR_MESSAGE);
+        });
+    },
     EmailJoin() {
       this.$router.push("/join");
     },
