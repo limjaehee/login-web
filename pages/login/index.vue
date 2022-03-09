@@ -90,6 +90,8 @@ export default {
           const token = credential.accessToken;
           // The signed-in user info.
           const user = result.user;
+
+          this.$router.push("login/success");
           // ...
         })
         .catch((error) => {
@@ -106,12 +108,7 @@ export default {
     EmailLogin() {
       signInWithEmailAndPassword(auth, this.email, this.password)
         .then((userCredential) => {
-          const id = userCredential.user.uid;
-          this.$router.push({
-            path: `login/${id}`,
-            name: "login-id",
-            query: { userId: id },
-          });
+          this.$router.push("login/success");
         })
         .catch((err) => {
           alert(errorCode.LOGIN_ERROR_MESSAGE);
