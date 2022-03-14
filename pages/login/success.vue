@@ -4,6 +4,7 @@
     <p>User Uid: {{ uid }}</p>
     <p>User email: {{ email }}</p>
     <v-btn color="success" @click="goLoginPage" class="mt-3"> 돌아가기 </v-btn>
+    <v-btn color="success" @click="goTodoPage" class="mt-3"> Todo Page </v-btn>
   </div>
 </template>
 
@@ -15,6 +16,9 @@ export default {
   methods: {
     goLoginPage() {
       this.$router.go(-1);
+    },
+    goTodoPage() {
+      this.$router.push("/todo");
     },
   },
   data() {
