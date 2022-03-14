@@ -91,7 +91,7 @@ export default {
           // The signed-in user info.
           const user = result.user;
 
-          this.$router.push("login/success");
+          this.$router.push("/todo");
           // ...
         })
         .catch((error) => {
@@ -108,7 +108,7 @@ export default {
     EmailLogin() {
       signInWithEmailAndPassword(auth, this.email, this.password)
         .then((userCredential) => {
-          this.$router.push("login/success");
+          this.$router.push("/todo");
         })
         .catch((err) => {
           alert(errorCode.LOGIN_ERROR_MESSAGE);
