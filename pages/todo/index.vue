@@ -18,6 +18,7 @@
               v-text="setDate(item.created_at)"
             ></v-list-item-subtitle>
           </v-list-item-content>
+          <v-btn color="primary" text @click="deleteTodo(item)"> X </v-btn>
         </v-list-item>
       </v-list-item-group>
     </v-list>
@@ -25,46 +26,53 @@
 </template>
 
 <script>
-import { collection, addDoc, getDocs, getFirestore } from "firebase/firestore";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-const auth = getAuth();
+import {
+  getDoc,
+  getFirestore,
+  doc,
+  arrayUnion,
+  arrayRemove,
+  updateDoc,
+} from "firebase/firestore";
 const db = getFirestore();
 
 export default {
   data() {
     return {
-      myTodo: "",
+      myTodo: null,
       todoList: [],
-      uid: null,
     };
-  },
-  created() {
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        this.uid = user.uid;
-      } else {
-      }
-    });
   },
   methods: {
     async addTodo() {
-      try {
-        const docRef = await addDoc(collection(db, "todo"), {
+      const washingtonRef = doc(db, "todo", "list");
+
+      await updateDoc(washingtonRef, {
+        regions: arrayUnion({
           title: this.myTodo,
           created_at: Date.now(),
-        });
-      } catch (e) {
-        console.error("Error adding document: ", e);
-      }
+        }),
+      });
+      this.resetMyTodo();
+      this.getTodo();
     },
     async getTodo() {
-      const querySnapshot = await getDocs(collection(db, "todo"));
+      const docRef = doc(db, "todo", "list");
+      const docSnap = await getDoc(docRef);
 
-      console.log(querySnapshot);
-      querySnapshot.forEach((doc) => {
-        // doc.data() is never undefined for query doc snapshots
-        this.todoList.push(doc.data());
+      if (docSnap.exists()) {
+        this.todoList = docSnap.data().regions;
+      } else {
+        console.log("No such document!");
+      }
+    },
+    async deleteTodo(item) {
+      const washingtonRef = doc(db, "todo", "list");
+
+      await updateDoc(washingtonRef, {
+        regions: arrayRemove(item),
       });
+      this.getTodo();
     },
     setDate(value) {
       let date = new Date(value);
@@ -73,6 +81,9 @@ export default {
       let year = date.getFullYear();
 
       return year + "-" + month + "-" + day;
+    },
+    resetMyTodo() {
+      this.myTodo = null;
     },
   },
   mounted() {
